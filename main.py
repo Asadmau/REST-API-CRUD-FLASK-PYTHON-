@@ -68,6 +68,56 @@ def tampilid(id):
     finally:
         cur.close()
         conn.close()
+# edit data
+
+
+@app.route('/edit', methods=['PUT'])
+def edit():
+    try:
+        _json = request.json
+        _id = _json['produk_id']
+        _nameproduk = _json['nama_produk']
+        _stok = _json['stok']
+        _harga = _json['harga']
+        _keterangan = _json['keterangan']
+        _status = _json['status']
+        if _nameproduk and _stok and _harga and _keterangan and _status and _id and request.method == 'PUT':
+            query = "update produk set nama_produk=%s, stok=%s, harga=%s, keterangan=%s, status=%s where produk_id=%s"
+            binData = (_nameproduk, _stok, _harga, _keterangan, _status, _id)
+            conn = dbsql.connect()
+            cursor = conn.cursor()
+            cursor.execute(query, binData)
+            conn.commit()
+            resp = jsonify('Edit succesfull', binData)
+            resp.status_code = 200
+            return resp
+        else:
+            return not_found()
+    except Exception as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+# delete data
+
+
+@app.route('/delete/<int:id>', methods=['DELETE'])
+def delete(id):
+    try:
+        conn = dbsql.connect()
+        cur = conn.cursor()
+        cur.execute('delete from produk where produk_id=%s', (id,))
+        # produkrow = cur.fetchone()
+        conn.commit()
+        res = jsonify('berhasil di hapus')
+        res.status_code = 200
+        return res
+    except Exception as e:
+        print(e)
+    finally:
+        cur.close()
+        conn.close()
+
 # mengatur error
 
 
